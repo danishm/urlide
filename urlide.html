@@ -1,0 +1,77 @@
+<html ng-app="urlGenie">
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+	</head>
+
+	<body>
+		<script type="text/javascript">
+
+			// Define the `urlGenie` module
+			var phonecatApp = angular.module('urlGenie', []);
+
+			// Define the `urlGenieController` controller on the `phonecatApp` module
+			phonecatApp.controller('urlGenieController', function($scope) {
+				$scope.url="";
+				$scope.urlPrefix = "";
+				$scope.params = [];
+
+				$scope.updateUrl = function() {
+					var url;
+					url = $scope.urlPrefix + "?";
+					for(i in $scope.params) {
+						var param = $scope.params[i];
+						url = url + param.key + "=" + param.value + "&";
+					}
+					$scope.url = url.slice(0, -1);
+				}
+
+				$scope.addParam = function() {
+					$scope.params.push({key:"new_param", value:"value"})
+					$scope.updateUrl();
+				}
+
+				$scope.updateParams = function() {
+					var parts = $scope.url.split("?");
+					$scope.urlPrefix = parts[0];
+					if(parts.length>1) {
+						var vars = parts[1].split("&");
+						var params = [];
+						for (i=0; i<vars.length; i++) {
+							var pairs = vars[i].split("=");
+							params.push({key:pairs[0], value:pairs[1]})
+						}
+
+						$scope.params = params;
+					}
+				}
+
+				// Initialization
+				$scope.updateUrl();
+			});
+		</script>
+
+		<h1>URL IDE</h1>
+		<div ng-controller="urlGenieController">
+			<h2>Full URL</h2>
+			<textarea ng-model="url" ng-change="updateParams()" placeholder="Place full URL here"></textarea>
+			
+			<h2>URL Prefix</h2>
+			<textarea ng-model="urlPrefix" ng-change="updateUrl()" placeholder=""></textarea>
+
+			<h2>Parameters</h2>
+			<table>
+				<tr>
+					<th>Param</th>
+					<th>Value</th>
+				</tr>
+
+				<tr ng-repeat="param in params">
+					<td><textarea ng-model="param.key" ng-change="updateUrl()"></textarea></td>
+					<td><textarea ng-model="param.value" ng-change="updateUrl()"></textarea></td>
+				</tr>
+			</table>
+			<a ng-click="addParam()" href="">Add Param</a>
+		</div>
+
+	</body>
+</html>
